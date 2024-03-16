@@ -75,7 +75,9 @@ public extension SVG {
     private func makeFormat() -> UIGraphicsImageRendererFormat {
         guard #available(iOS 12.0, *) else {
             let f = UIGraphicsImageRendererFormat.default()
+            #if os(iOS)
             f.prefersExtendedRange = true
+            #endif
             return f
         }
         let f = UIGraphicsImageRendererFormat.preferred()
@@ -125,7 +127,14 @@ extension SVG {
     }
 
     func makeBounds(size: CGSize?, scale: CGFloat, insets: Insets) -> (bounds: CGRect, pixelsWide: Int, pixelsHigh: Int) {
-        let scale = scale == 0 ? UIScreen.main.scale : scale
+        var scale = scale
+        if scale == 0 {
+            #if os(visionOS)
+            scale = 2
+            #else
+            scale = UIScreen.main.scale
+            #endif
+        }
         return Self.makeBounds(size: size, defaultSize: self.size, scale: scale, insets: insets)
     }
 
